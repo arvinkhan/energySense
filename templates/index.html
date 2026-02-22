@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Energy Dashboard</title>
+    <style>
+        body {
+            background: #f5f5f5;
+            font-family: Arial;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin: 40px;
+        }
+
+        .card {
+            width: 260px;
+            padding: 20px;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+            transition: 0.2s;
+        }
+
+        .ok { border-left: 6px solid #3ba55d; }
+        .warn { border-left: 6px solid #e6a700; }
+        .danger { border-left: 6px solid #e63946; }
+
+        .title { font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<h1 style="text-align:center;">Energy Monitoring Dashboard</h1>
+
+<div class="container" id="cards"></div>
+
+<script>
+function updateDashboard() {
+    fetch("/live-data")
+        .then(res => res.json())
+        .then(data => {
+            let container = document.getElementById("cards");
+            container.innerHTML = ""; // clear & rebuild
+
+            for (let room in data) {
+                let info = data[room];
+
+                let card = document.createElement("div");
+                card.className = "card " + info.status;
+
+                card.innerHTML = `
+                    <div class="title">${room}</div>
+                    <p><b>Lights:</b> ${info.lights}</p>
+                    <p><b>People:</b> ${info.people}</p>
+                    <p><b>Waste:</b> ${info.waste}</p>
+                    <p><b>Status:</b> ${info.status}</p>
+                `;
+
+                container.appendChild(card);
+            }
+        });
+}
+
+// update every 1 sec
+setInterval(updateDashboard, 500);
+updateDashboard();
+</script>
+
+</body>
+</html>
